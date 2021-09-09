@@ -1,18 +1,23 @@
 <template>
   <div id="app">
     <Header :genres="genres" @genreSelector="selectedFilter"/>
+    <main>
+      <DiscVisualizer :filteredDiscs="filteredDiscs"/>
+    </main>
   </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue';
+import DiscVisualizer from '@/components/DiscVisualizer.vue';
 
 import axios from 'axios'
 
 export default {
   name: 'App',
   components: {
-    Header
+    Header,
+    DiscVisualizer
   },
   data(){
     return{
@@ -33,11 +38,16 @@ export default {
       });
       return genres;
     },
+    filteredDiscs(){
+      let sortedDiscs = [... this.discs]
+      sortedDiscs.sort((a,b)=>a.year - b.year);
+      if (this.genreFilter === 'All') return sortedDiscs;
+      return sortedDiscs.filter(disc => disc.genre === this.genreFilter)
+    }
   },
   created(){
     axios.get('https://flynn.boolean.careers/exercises/api/array/music').then(res =>{
       this.discs = res.data.response
-      console.log(this.discs)
     })
   }
 }
